@@ -1,0 +1,105 @@
+/* Informe de la semana 9: estilos limitados a la página del IPERC y HAZOP. */
+.week9-report{min-width:0}
+.week9-report .article-section>p,.week9-report .article-section>ul{font-size:14px;line-height:1.9}
+.week9-report .article-section>ul{padding-left:21px}
+.week9-report .article-section>ul li{margin:8px 0}
+.week9-report h3{font:700 21px/1.4 'Space Grotesk',sans-serif;letter-spacing:-.015em;margin:27px 0 13px}
+.week9-report .source-note{font-size:10px!important;line-height:1.8!important;color:var(--muted);margin-top:14px}
+.week9-report .text-link{font-size:inherit;overflow-wrap:anywhere}
+.report-trace{padding:22px 24px;background:var(--panel);border:1px solid var(--border);border-radius:10px;margin-top:24px}
+.report-trace h3{font-size:17px;margin:0 0 12px}
+.report-trace p{font-size:12px;line-height:1.9;color:var(--muted);margin:10px 0}
+.report-trace p:last-child{margin-bottom:0}
+.week9-report .step-card{padding:19px 20px;gap:17px;margin-top:14px}
+.week9-report .step-card p{font-size:12px;line-height:1.85}
+.week9-report .step-card strong{font-size:14px}
+.risk-scale{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:23px 0}
+.risk-scale>span{background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:12px;text-align:center;font-size:11px;color:var(--muted)}
+.risk-scale b{display:block;color:var(--text);font:700 20px 'Space Grotesk',sans-serif;margin-bottom:4px}
+.report-key-point{padding:19px 21px;border-left:3px solid var(--teal);background:var(--panel);font-size:13px!important;line-height:1.9!important}
+.hazop-example{padding:24px;background:var(--panel);border:1px solid var(--border);border-radius:11px;margin:27px 0}
+.hazop-example .example-label{font-size:9px;letter-spacing:.14em;font-weight:800;color:var(--teal);margin:0}
+.hazop-example h3{font-size:22px;margin:12px 0 19px}
+.hazop-example dl{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:0}
+.hazop-example dt{font-size:10px;color:var(--muted);margin-bottom:5px}
+.hazop-example dd{margin:0;font-size:12px;line-height:1.85}
+.hazop-example>p:last-child{margin:22px 0 0}
+.example-state{display:inline-block;font-size:10px;color:var(--muted);margin-top:10px}
+.risk-badge{display:inline-block;padding:4px 9px;background:color-mix(in srgb,var(--risk-color) 13%,var(--panel));border:1px solid color-mix(in srgb,var(--risk-color) 50%,var(--border));border-radius:5px;font-size:10px;font-weight:700;color:var(--text);white-space:nowrap}
+.risk-critical{--risk-color:#e66e83}
+.risk-high{--risk-color:#eea265}
+.risk-medium{--risk-color:#dbc569}
+.risk-low{--risk-color:#61c6b1}
+.guide-words{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0}
+.guide-words>span{font-size:10px;font-weight:700;letter-spacing:.035em;padding:7px 11px;border:1px solid var(--border);background:var(--soft);border-radius:5px}
+.hazop-browser{margin-top:27px;padding:23px;border:1px solid var(--border);border-radius:10px;background:var(--panel)}
+.hazop-browser>label{display:block;margin-bottom:13px}
+.hazop-browser>label strong{display:block;font-size:14px;margin-bottom:7px}
+.hazop-browser>label span{font-size:11px;line-height:1.8;color:var(--muted)}
+#hazop-node{width:100%;min-height:45px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:10px 12px;font:12px 'DM Sans',sans-serif}
+#hazop-node:focus-visible,.hazop-record summary:focus-visible,.action-record summary:focus-visible,.report-table-wrap:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+.hazop-node-summary{font-size:11px;color:var(--muted);line-height:1.8;margin:17px 0}
+.hazop-record{border-top:1px solid var(--border)}
+.hazop-record>summary{display:flex;align-items:center;gap:12px;padding:15px 0;cursor:pointer;list-style:none}
+.hazop-record>summary::-webkit-details-marker{display:none}
+.hazop-record>summary:before{content:'+';flex:0 0 14px;color:var(--teal);font-size:16px}
+.hazop-record[open]>summary:before{content:'−'}
+.hazop-guide{font-size:9px;font-weight:800;color:var(--teal);flex:0 0 70px}
+.hazop-deviation{flex:1;font-size:12px;line-height:1.7}
+.hazop-record .risk-badge{font-size:9px}
+.hazop-record-content{padding:4px 0 20px 26px}
+.hazop-record-content dl{margin:0;display:grid;grid-template-columns:1fr 1fr;gap:17px}
+.hazop-record-content dl>div:last-child{grid-column:1/-1}
+.hazop-record-content dt{font-size:10px;color:var(--muted);margin-bottom:5px}
+.hazop-record-content dd{font-size:12px;line-height:1.85;margin:0}
+.hazop-record-content .hazop-score{font-size:11px;color:var(--muted);padding-top:14px;margin-bottom:0}
+.risk-figure{margin:27px 0}
+.risk-distribution{border-bottom:1px solid var(--border);padding:20px 0}
+.risk-distribution:first-child{padding-top:0}
+.risk-distribution-heading{display:flex;justify-content:space-between;gap:20px;align-items:center;font-size:13px;margin-bottom:13px}
+.risk-distribution-heading>span{font-size:11px;color:var(--muted);white-space:nowrap}
+.risk-stack{display:flex;height:14px;overflow:hidden;border-radius:3px;background:var(--soft)}
+.risk-stack>span{display:block;background:var(--risk-color)}
+.risk-counts{display:flex;flex-wrap:wrap;gap:9px 19px;list-style:none;padding:0;margin:13px 0 0}
+.risk-counts>li{display:flex;gap:5px;align-items:center;font-size:11px;color:var(--muted)}
+.risk-counts strong{font-weight:700;color:var(--text)}
+.risk-counts i{width:8px;height:8px;display:inline-block;background:var(--risk-color);border-radius:2px;margin-right:2px}
+.risk-figure figcaption{font-size:10px;color:var(--muted);line-height:1.8;margin-top:14px}
+.report-table-wrap{overflow-x:auto;margin:23px 0;border:1px solid var(--border);border-radius:9px}
+.report-table{border-collapse:collapse;min-width:640px;width:100%;font-size:12px;text-align:left}
+.report-table th,.report-table td{padding:16px;vertical-align:top;border-bottom:1px solid var(--border);line-height:1.8}
+.report-table thead th{background:var(--soft);font-size:10px;font-weight:800;color:var(--muted)}
+.report-table tbody th{width:27%;font-size:10px;color:var(--teal);font-weight:600}
+.report-table tbody td:nth-child(2){width:23%;font-weight:600}
+.report-table tbody td:last-child{color:var(--muted)}
+.report-table tbody tr:nth-child(even){background:var(--panel)}
+.report-table tbody tr:last-child th,.report-table tbody tr:last-child td{border-bottom:0}
+.verification-gates{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:25px 0}
+.verification-gates>div{padding:19px 22px;border-bottom:1px solid var(--border);background:var(--panel)}
+.verification-gates>div:last-child{border-bottom:0}
+.verification-gates strong{font-size:13px}
+.verification-gates p{font-size:12px;line-height:1.9;margin:7px 0 0;color:var(--muted)}
+.action-register{margin:24px 0;border-bottom:1px solid var(--border)}
+.action-record{border-top:1px solid var(--border);scroll-margin-top:105px}
+.action-record>summary{display:flex;align-items:center;gap:13px;cursor:pointer;padding:15px 0;font-size:12px;line-height:1.8;list-style:none}
+.action-record>summary::-webkit-details-marker{display:none}
+.action-record>summary:before{content:'+';flex:0 0 12px;font-size:17px;color:var(--teal)}
+.action-record[open]>summary:before{content:'−'}
+.record-code{color:var(--teal);font-size:10px;white-space:nowrap}
+.action-record>summary>span:nth-child(2){flex:1}
+.action-status{font-size:9px;color:var(--muted);white-space:nowrap}
+.action-record dl{display:grid;grid-template-columns:1fr 1fr;gap:17px;margin:0;padding:4px 0 22px 25px}
+.action-record dl>div:nth-child(2){grid-column:1/-1;grid-row:2}
+.action-record dt{font-size:10px;color:var(--muted);margin-bottom:5px}
+.action-record dd{font-size:12px;line-height:1.8;margin:0}
+.report-download{display:flex;justify-content:space-between;gap:23px;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:24px;margin:23px 0}
+.report-download strong{font-size:14px}
+.report-download p{font-size:12px;line-height:1.9;color:var(--muted);margin:8px 0 0}
+.report-download .btn{font-size:12px;white-space:nowrap}
+.report-sources{border:1px solid var(--border);border-radius:8px;padding:18px 20px;margin-top:23px;font-size:12px}
+.report-sources summary{font-size:12px;font-weight:700;cursor:pointer}
+.report-sources ul{padding-left:18px;color:var(--muted);line-height:1.9}
+.report-sources li{margin:8px 0}
+.report-sources p{font-size:11px;line-height:1.9;color:var(--muted)}
+@media(max-width:1000px){.hazop-record>summary{flex-wrap:wrap;gap:8px}.hazop-deviation{min-width:160px}.hazop-record .risk-badge{margin-left:auto}.hazop-example dl{grid-template-columns:1fr}.report-download{align-items:start;flex-direction:column}}
+@media(max-width:760px){.week9-report .article-section>p,.week9-report .article-section>ul{font-size:14px}.week9-report h3{font-size:20px}.report-trace,.hazop-example{padding:20px}.risk-scale{grid-template-columns:repeat(2,1fr)}.hazop-browser{padding:19px}#hazop-node{font-size:16px;min-height:46px}.hazop-guide{flex-basis:64px}.hazop-deviation{font-size:12px;min-width:150px}.hazop-record-content{padding-left:0}.hazop-record-content dl{grid-template-columns:1fr}.hazop-record>summary{padding:17px 0;align-items:start}.hazop-record .risk-badge{margin-left:25px}.risk-distribution-heading{font-size:12px}.risk-counts{gap:8px 15px}.risk-distribution-heading>span{font-size:10px}.action-record>summary{flex-wrap:wrap;gap:8px}.action-record>summary>span:nth-child(2){flex:1 1 210px}.action-status{margin-left:27px}.action-record dl{grid-template-columns:1fr;padding-left:25px}.action-record dl>div:nth-child(2){grid-column:auto;grid-row:auto}.report-download{padding:21px}.report-download .btn{width:auto}.report-table th,.report-table td{padding:14px}.week9-report .step-card{padding:17px;gap:13px}}
