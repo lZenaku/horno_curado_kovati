@@ -1,6 +1,6 @@
-# HORNO PID · Bitácora 2026
+# KOVAX · Bitácora 2026
 
-Sitio estático en HTML, CSS y JavaScript, inspirado en la organización documental de Fab Academy (sin afiliación).
+Bitácora del proyecto KOVAX: prototipo de horno eléctrico automatizado. Sitio estático en HTML, CSS y JavaScript, inspirado en la organización documental de Fab Academy (sin afiliación).
 
 ## Cómo usar
 1. Descomprime el ZIP.
