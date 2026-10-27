@@ -1,0 +1,43 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Cronograma interactivo de 16 semanas: 5 etapas, 92 actividades y 16 hitos del prototipo de horno eléctrico. Descargas de Microsoft Project, XML y PDF."><meta name="theme-color" content="#0b111d"><title>Cronograma y Gantt | Horno PID · TECSUP</title><link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/css/styles.css"><link rel="stylesheet" href="assets/css/cronograma.css"></head><body><header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-symbol">H<span>·</span></span><span><strong>HORNO<span class="brand-accent">PID</span></strong><small>BITÁCORA DE INGENIERÍA · 2026</small></span></a><button class="mobile-menu" type="button" aria-label="Abrir menú" aria-expanded="false">☰</button><nav class="main-nav" id="nav"><a class="nav-link " href="index.html">Inicio</a><a class="nav-link " href="semanas/index.html">16 semanas</a><a class="nav-link " href="proyecto.html">Proyecto final</a><a class="nav-link active" href="documentacion.html">Documentación</a><a class="nav-link " href="equipo.html">Equipo</a></nav><button class="theme-toggle" type="button" title="Cambiar tema" aria-label="Cambiar tema"><span class="theme-icon">☾</span></button></div></header><main id="contenido" class="schedule-page">
+<section class="page-hero container schedule-hero">
+  <a class="back-link" href="documentacion.html">← Documentación técnica</a>
+  <p class="eyebrow label-plain">GESTIÓN / PLAN DE TRABAJO R01</p>
+  <h1>Un proyecto.<br><span class="gradient-text">16 semanas de trabajo.</span></h1>
+  <p>Explora el cronograma completo del horno eléctrico: etapas, actividades, responsables e hitos, desde el 17 de agosto hasta el 6 de diciembre de 2026.</p>
+  <div class="schedule-meta"><span><b>5</b> etapas</span><span><b>92</b> actividades</span><span><b>16</b> hitos</span><a href="#archivos">PDF, MPP y XML <span aria-hidden="true">↓</span></a></div>
+  <p class="schedule-source">Planificación de Project guardada el 09/10/2026. Los avances reales no están informados en el archivo; las fechas y los hitos se muestran como previstos.</p>
+</section>
+<section class="schedule-workspace" aria-labelledby="gantt-title">
+  <div class="schedule-workspace-heading"><div><p class="eyebrow label-plain">CRONOGRAMA INTERACTIVO</p><h2 id="gantt-title">Del alcance a la entrega final</h2></div><p>Despliega una semana y selecciona una actividad para consultar sus fechas, responsables y dependencias.</p></div>
+  <div class="gantt-shell" id="gantt-shell">
+    <div class="gantt-toolbar">
+      <label class="gantt-search"><span>Buscar actividad o responsable</span><input id="gantt-search" type="search" placeholder="PLC, planos, Sandro…" aria-controls="gantt-rows"></label>
+      <label><span>Etapa</span><select id="gantt-stage"><option value="">Todas las etapas</option><option value="1">1. Definir</option><option value="23">2. Diseñar</option><option value="46">3. Ingeniería</option><option value="69">4. Implementar y validar</option><option value="95">5. Verificar y cerrar</option></select></label>
+      <label><span>Contenido</span><select id="gantt-view"><option value="weeks">Resumen por semanas</option><option value="all">Todas las actividades</option><option value="milestones">Solo hitos</option></select></label>
+      <label><span>Escala</span><select id="gantt-scale"><option value="week">Semanas</option><option value="day">Días</option></select></label>
+      <button class="gantt-expand" id="gantt-expand" type="button" aria-pressed="false">Ampliar vista ↗</button>
+    </div>
+    <div class="gantt-options"><label><input id="gantt-critical" type="checkbox"> Marcar críticas de Project</label><label><input id="gantt-links" type="checkbox"> Mostrar dependencias</label><span class="gantt-legend"><span><i class="legend-bar"></i> Actividad</span><span><i class="legend-summary"></i> Resumen</span><span><i class="legend-milestone"></i> Hito</span></span></div>
+    <p class="gantt-help">La tabla y el calendario se desplazan juntos. En móvil, desliza horizontalmente para recorrer las semanas.</p>
+    <div id="gantt-scroller" class="gantt-scroller" role="region" aria-label="Diagrama de Gantt desplazable" tabindex="0">
+      <div id="gantt-grid" class="gantt-grid"><div class="gantt-axis" id="gantt-axis"></div><div class="gantt-body" id="gantt-body"><div id="gantt-rows"></div><svg id="gantt-connections" class="gantt-connections" aria-hidden="true"></svg></div></div>
+      <p id="gantt-empty" class="gantt-empty" hidden>No hay actividades que coincidan con la búsqueda y los filtros.</p>
+    </div>
+    <div class="gantt-status"><span id="gantt-count" role="status" aria-live="polite"></span><span id="gantt-link-count"></span></div>
+  </div>
+  <noscript><p>Activa JavaScript para consultar el Gantt interactivo. Puedes abrir el PDF completo y descargar los archivos de Project en la sección siguiente.</p></noscript>
+</section>
+<section id="archivos" class="container schedule-files" aria-labelledby="files-title">
+  <p class="eyebrow label-plain">DOCUMENTOS ORIGINALES</p><h2 id="files-title">El mismo plan, en tres formatos</h2>
+  <p>La vista interactiva utiliza las fechas, la jerarquía y las asignaciones del XML. Los tres documentos se conservan en su formato original.</p>
+  <div class="schedule-file-grid">
+    <article><span class="schedule-file-format">PDF</span><h3>Exportación de Project</h3><p>El diagrama original del informe, distribuido en 15 páginas.</p><a class="text-link" href="assets/docs/cronograma/horno-16-semanas.pdf" target="_blank" rel="noopener">Abrir PDF completo ↗</a><a href="assets/docs/cronograma/horno-16-semanas.pdf" download>Descargar PDF · 198 KB ↓</a></article>
+    <article><span class="schedule-file-format">MPP</span><h3>Archivo de Microsoft Project</h3><p>Para abrir el cronograma y continuar su edición en Project.</p><a class="text-link" href="assets/docs/cronograma/horno-16-semanas.mpp" download>Descargar MPP · 279 KB ↓</a></article>
+    <article><span class="schedule-file-format">XML</span><h3>Archivo de intercambio</h3><p>La estructura de tareas que alimenta esta vista del cronograma.</p><a class="text-link" href="assets/docs/cronograma/horno-16-semanas.xml" download>Descargar XML · 264 KB ↓</a></article>
+  </div>
+  <details class="schedule-pdf"><summary>Consultar el PDF original dentro de esta página</summary><p><a class="text-link" href="assets/docs/cronograma/horno-16-semanas.pdf" target="_blank" rel="noopener">Abrir en una pestaña independiente ↗</a></p><iframe title="Cronograma original de Microsoft Project, 15 páginas" src="assets/docs/cronograma/horno-16-semanas.pdf#view=FitH" loading="lazy"></iframe></details>
+  <p class="schedule-calendar-note">Calendario del plan: lunes a domingo, de 09:00 a 13:00 y de 15:00 a 19:00. La duración indicada corresponde a jornadas de 8 horas en Project; las asignaciones de recursos se consultan en la ficha de cada actividad.</p>
+  <a class="back-link" href="documentacion.html">← Volver a documentación técnica</a>
+</section>
+<dialog id="task-dialog" class="task-dialog" aria-labelledby="task-dialog-title"><div class="task-dialog-top"><span>FICHA DEL CRONOGRAMA</span><form method="dialog"><button type="submit" aria-label="Cerrar ficha">✕</button></form></div><div id="task-dialog-content"></div></dialog>
+</main><footer class="footer"><div class="footer-inner"><div><strong>HORNO<span class="brand-accent">PID</span></strong><p>Documentación de ingeniería · TECSUP · Arequipa, Perú</p></div><div><a href="semanas/index.html">Bitácora semanal</a><a href="proyecto.html">Proyecto final</a><a href="documentacion.html">Documentos</a></div><span class="muted">© 2026 · Proyecto académico · Sitio en desarrollo</span></div></footer><script src="assets/js/main.js" defer></script><script src="assets/js/cronograma-datos.js" defer></script><script src="assets/js/cronograma.js" defer></script></body></html>
