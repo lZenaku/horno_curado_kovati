@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Panel de supervisión y control del horno KOVAX. Integración con ThingsBoard en preparación.">
+  <meta name="theme-color" content="#0b111d">
+  <title>SCADA | KOVAX · TECSUP</title>
+  <link rel="icon" href="assets/images/favicon.svg?v=kovax" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/styles.css?v=kovax-scada">
+  <link rel="stylesheet" href="assets/css/scada.css">
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="index.html" aria-label="KOVAX · Inicio"><span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 15V49M44 15L23 33" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 33L44 49" stroke="#ffb77c" stroke-width="6" stroke-linecap="round"/></svg></span><span class="brand-copy"><strong>KOVA<span class="brand-accent">X</span></strong><small>HORNO ELÉCTRICO · TECSUP</small></span></a><button class="mobile-menu" type="button" aria-label="Abrir menú" aria-expanded="false">☰</button><nav class="main-nav" id="nav"><a class="nav-link" href="index.html">Inicio</a><a class="nav-link " href="semanas/index.html">16 semanas</a><a class="nav-link " href="proyecto.html">Proyecto final</a><a class="nav-link " href="documentacion.html">Documentación</a><a class="nav-link " href="equipo.html">Equipo</a><a class="nav-link active" href="scada.html" aria-current="page">SCADA</a></nav><button class="theme-toggle" type="button" title="Cambiar tema" aria-label="Cambiar tema"><span class="theme-icon">☾</span></button></div></header>
+  <main id="contenido" class="scada container">
+    <header class="scada-intro">
+      <div>
+        <p class="scada-kicker">KOVAX <span aria-hidden="true">/</span> HORNO ELÉCTRICO</p>
+        <h1>Panel SCADA</h1>
+        <p>Supervisión del horno y ajuste de la consigna de temperatura.</p>
+      </div>
+      <div class="scada-connection">
+        <p id="scada-connection" class="scada-badge">En construcción</p>
+        <p>Telemetría sin conectar</p>
+      </div>
+    </header>
+
+    <section class="scada-monitoring" aria-labelledby="scada-monitoring-title">
+      <div class="scada-section-heading">
+        <h2 id="scada-monitoring-title">Variables del horno</h2>
+        <p id="scada-updated">Última lectura · pendiente</p>
+      </div>
+      <dl class="scada-metrics">
+        <div class="scada-panel scada-metric">
+          <dt>Temperatura medida <abbr title="Variable de proceso">PV</abbr></dt>
+          <dd><strong id="scada-pv"><span class="scada-sr-only">Sin lectura</span><span aria-hidden="true">—</span></strong> <span class="scada-unit">°C</span></dd>
+        </div>
+        <div class="scada-panel scada-metric">
+          <dt>Consigna activa <abbr title="Punto de consigna">SP</abbr></dt>
+          <dd><strong id="scada-sp"><span class="scada-sr-only">Sin lectura</span><span aria-hidden="true">—</span></strong> <span class="scada-unit">°C</span></dd>
+        </div>
+        <div class="scada-panel scada-metric">
+          <dt>Salida de calefacción</dt>
+          <dd><strong id="scada-heating"><span class="scada-sr-only">Sin lectura</span><span aria-hidden="true">—</span></strong> <span class="scada-unit">%</span></dd>
+        </div>
+        <div class="scada-panel scada-metric">
+          <dt>Ventiladores</dt>
+          <dd id="scada-fans" class="scada-text-value">Sin lectura</dd>
+        </div>
+      </dl>
+    </section>
+
+    <div class="scada-workspace">
+      <section class="scada-panel scada-trends" aria-labelledby="scada-trends-title">
+        <h2 id="scada-trends-title">Tendencia térmica</h2>
+        <ul class="scada-legend" aria-label="Series previstas">
+          <li><span class="scada-key" aria-hidden="true"></span>Temperatura medida (PV)</li>
+          <li><span class="scada-key scada-key-sp" aria-hidden="true"></span>Consigna (SP)</li>
+        </ul>
+        <div id="scada-trend">
+          <div class="scada-chart">
+            <span class="scada-chart-unit" aria-hidden="true">°C</span>
+            <p>La gráfica se mostrará cuando lleguen los datos del horno.</p>
+          </div>
+          <p class="scada-chart-caption" aria-hidden="true">Tiempo</p>
+        </div>
+      </section>
+
+      <div class="scada-side">
+        <section class="scada-panel" aria-labelledby="scada-control-title">
+          <h2 id="scada-control-title">Control de consigna</h2>
+          <p id="scada-control-note" class="scada-note">El envío se habilitará cuando se integre y valide el control remoto.</p>
+          <fieldset id="scada-control" disabled aria-describedby="scada-control-note">
+            <legend class="scada-sr-only">Ajuste de temperatura</legend>
+            <label for="scada-requested-sp">Nueva consigna (°C)</label>
+            <input id="scada-requested-sp" type="number" step="any" placeholder="—">
+            <button class="scada-send" type="button" disabled>Enviar consigna</button>
+          </fieldset>
+        </section>
+
+        <section class="scada-panel" aria-labelledby="scada-status-title">
+          <h2 id="scada-status-title">Estado del horno</h2>
+          <dl class="scada-status-list">
+            <div><dt>Modo de operación</dt><dd id="scada-mode">Sin lectura</dd></div>
+            <div><dt>Alarmas activas</dt><dd id="scada-alarms">Sin lectura</dd></div>
+          </dl>
+        </section>
+      </div>
+    </div>
+
+    <section class="scada-panel scada-integration" aria-labelledby="scada-integration-title">
+      <div class="scada-section-heading">
+        <h2 id="scada-integration-title">Integración prevista</h2>
+        <a href="semanas/semana-12.html">Ver las pruebas del horno <span aria-hidden="true">↗</span></a>
+      </div>
+      <ol class="scada-route" aria-label="Ruta prevista de la telemetría">
+        <li><strong>PLC Siemens</strong><span>Control del horno</span></li>
+        <li><strong>ESP32</strong><span>Enlace Modbus TCP con el PLC</span></li>
+        <li><strong>ThingsBoard</strong><span>Plataforma de telemetría</span></li>
+        <li><strong>Web KOVAX</strong><span>Panel de supervisión</span></li>
+      </ol>
+    </section>
+  </main>
+  <footer class="footer"><div class="footer-inner"><div><strong class="footer-brand">KOVA<span class="brand-accent">X</span></strong><p>Documentación de ingeniería · TECSUP · Arequipa, Perú</p></div><div><a href="semanas/index.html">Bitácora semanal</a><a href="proyecto.html">Proyecto final</a><a href="documentacion.html">Documentos</a></div><span class="muted">© 2026 · Proyecto académico · Sitio en desarrollo</span></div></footer>
+</body>
+</html>

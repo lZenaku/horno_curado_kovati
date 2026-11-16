@@ -5,3 +5,22 @@
 .footer-brand{font-family:'Space Grotesk',sans-serif;font-size:21px;letter-spacing:.16em;line-height:1.2}
 .hero-lead>strong{font-weight:700;color:var(--text);letter-spacing:.04em}
 html[data-theme=light] .brand .brand-accent,html[data-theme=light] .footer-brand .brand-accent{color:#11796f}
+
+@media (min-width: 761px) and (max-width: 1000px) {
+  .header-inner {
+    gap: 14px;
+    padding-inline: 20px;
+  }
+
+  .main-nav {
+    white-space: nowrap;
+  }
+
+  .main-nav .nav-link {
+    padding-inline: 5px;
+  }
+
+  .theme-toggle {
+    flex: 0 0 38px;
+  }
+}
