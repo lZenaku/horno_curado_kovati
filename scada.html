@@ -3,13 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Panel de supervisión y control del horno KOVAX. Integración con ThingsBoard en preparación.">
+  <meta name="description" content="Panel de supervisión y control del horno KOVAX. Telemetría y control mediante la API de ThingsBoard Cloud.">
   <meta name="theme-color" content="#0b111d">
   <title>SCADA | KOVAX · TECSUP</title>
   <link rel="icon" href="assets/images/favicon.svg?v=kovax" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/styles.css?v=kovax-scada">
-  <link rel="stylesheet" href="assets/css/scada.css">
+  <link rel="stylesheet" href="assets/css/scada.css?v=tb-api">
   <script src="assets/js/main.js" defer></script>
+  <script type="module" src="assets/js/scada.js?v=tb-api"></script>
 </head>
 <body>
   <header class="site-header"><div class="header-inner"><a class="brand" href="index.html" aria-label="KOVAX · Inicio"><span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 15V49M44 15L23 33" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 33L44 49" stroke="#ffb77c" stroke-width="6" stroke-linecap="round"/></svg></span><span class="brand-copy"><strong>KOVA<span class="brand-accent">X</span></strong><small>HORNO ELÉCTRICO · TECSUP</small></span></a><button class="mobile-menu" type="button" aria-label="Abrir menú" aria-expanded="false">☰</button><nav class="main-nav" id="nav"><a class="nav-link" href="index.html">Inicio</a><a class="nav-link " href="semanas/index.html">16 semanas</a><a class="nav-link " href="proyecto.html">Proyecto final</a><a class="nav-link " href="documentacion.html">Documentación</a><a class="nav-link " href="equipo.html">Equipo</a><a class="nav-link active" href="scada.html" aria-current="page">SCADA</a></nav><button class="theme-toggle" type="button" title="Cambiar tema" aria-label="Cambiar tema"><span class="theme-icon">☾</span></button></div></header>
@@ -21,15 +22,55 @@
         <p>Supervisión del horno y ajuste de la consigna de temperatura.</p>
       </div>
       <div class="scada-connection">
-        <p id="scada-connection" class="scada-badge">En construcción</p>
-        <p>Telemetría sin conectar</p>
+        <p id="scada-connection" class="scada-badge" role="status">Sin sesión</p>
+        <p id="scada-connection-detail">ThingsBoard Cloud</p>
       </div>
     </header>
+
+
+    <details class="scada-panel scada-access" id="scada-access" open>
+      <summary>Acceso a ThingsBoard <span id="scada-session-label">Conectar dispositivo</span></summary>
+      <form id="scada-login" class="scada-login">
+        <p class="scada-access-description">KOVAX_ESP32_HORNO · Conecta tu acceso de usuario para consultar la telemetría.</p>
+        <div class="scada-login-fields">
+          <div>
+            <label for="scada-server">Servidor</label>
+            <select id="scada-server" name="server">
+              <option value="https://thingsboard.cloud">ThingsBoard Cloud · Norteamérica</option>
+              <option value="https://eu.thingsboard.cloud">ThingsBoard Cloud · Europa</option>
+            </select>
+          </div>
+          <div>
+            <label for="scada-device-id">Device ID</label>
+            <input id="scada-device-id" name="device" value="35792330-e813-11f1-9a44-493a121968cd" required spellcheck="false" autocomplete="off">
+          </div>
+          <div>
+            <label for="scada-auth-type">Tipo de acceso</label>
+            <select id="scada-auth-type" name="authType">
+              <option value="ApiKey">Clave API de usuario</option>
+              <option value="Bearer">Token de sesión JWT</option>
+            </select>
+          </div>
+          <div>
+            <label for="scada-credential">Clave o token de usuario</label>
+            <input id="scada-credential" type="password" autocomplete="off" required aria-describedby="scada-credential-note">
+          </div>
+        </div>
+        <p id="scada-credential-note" class="scada-note">Introduce una clave API de tu perfil de ThingsBoard o un JWT de usuario. La credencial se conserva en memoria hasta desconectar o cerrar esta página.</p>
+        <div class="scada-access-actions">
+          <button class="btn primary" id="scada-connect" type="submit" disabled>Conectar</button>
+          <button class="btn secondary" id="scada-disconnect" type="button" hidden>Desconectar</button>
+          <a href="https://thingsboard.io/docs/paas/reference/rest-api/#authentication" target="_blank" rel="noopener noreferrer">Cómo obtener el acceso de usuario ↗</a>
+        </div>
+      </form>
+      <p id="scada-access-message" class="scada-note" role="status">El enlace MQTT del ESP32 está implementado. Las variables del horno se incorporarán al configurar Modbus con el PLC.</p>
+      <noscript><p>Activa JavaScript para consultar ThingsBoard y utilizar este panel.</p></noscript>
+    </details>
 
     <section class="scada-monitoring" aria-labelledby="scada-monitoring-title">
       <div class="scada-section-heading">
         <h2 id="scada-monitoring-title">Variables del horno</h2>
-        <p id="scada-updated">Última lectura · pendiente</p>
+        <p id="scada-updated">Última telemetría · pendiente</p>
       </div>
       <dl class="scada-metrics">
         <div class="scada-panel scada-metric">
@@ -46,44 +87,54 @@
         </div>
         <div class="scada-panel scada-metric">
           <dt>Ventiladores</dt>
-          <dd id="scada-fans" class="scada-text-value">Sin lectura</dd>
+          <dd class="scada-fan-values"><span>F-01 <strong id="scada-fan-01">—</strong></span><span>F-02 <strong id="scada-fan-02">—</strong></span></dd>
         </div>
       </dl>
     </section>
 
+    <p class="scada-note" id="scada-data-message" role="status">Conecta la sesión para consultar el estado del ESP32 y del PLC.</p>
     <div class="scada-workspace">
       <section class="scada-panel scada-trends" aria-labelledby="scada-trends-title">
         <h2 id="scada-trends-title">Tendencia térmica</h2>
-        <ul class="scada-legend" aria-label="Series previstas">
+        <ul class="scada-legend" aria-label="Series de temperatura">
           <li><span class="scada-key" aria-hidden="true"></span>Temperatura medida (PV)</li>
           <li><span class="scada-key scada-key-sp" aria-hidden="true"></span>Consigna (SP)</li>
         </ul>
         <div id="scada-trend">
-          <div class="scada-chart">
-            <span class="scada-chart-unit" aria-hidden="true">°C</span>
-            <p>La gráfica se mostrará cuando lleguen los datos del horno.</p>
+          <div class="scada-chart scada-live-chart">
+            <canvas id="scada-chart" role="img" aria-label="Tendencia de temperatura medida y consigna durante los últimos 30 minutos"></canvas>
+            <p id="scada-chart-empty">Esperando registros de temperatura del PLC.</p>
           </div>
-          <p class="scada-chart-caption" aria-hidden="true">Tiempo</p>
+          <p id="scada-chart-note" class="scada-chart-caption">Últimos 30 minutos · hora de Lima</p>
         </div>
       </section>
 
       <div class="scada-side">
         <section class="scada-panel" aria-labelledby="scada-control-title">
           <h2 id="scada-control-title">Control de consigna</h2>
-          <p id="scada-control-note" class="scada-note">El envío se habilitará cuando se integre y valide el control remoto.</p>
+          <p id="scada-control-note" class="scada-note" role="status">El ajuste se habilita con una sesión conectada y datos recientes del PLC.</p>
+          <form id="scada-setpoint-form">
           <fieldset id="scada-control" disabled aria-describedby="scada-control-note">
             <legend class="scada-sr-only">Ajuste de temperatura</legend>
             <label for="scada-requested-sp">Nueva consigna (°C)</label>
-            <input id="scada-requested-sp" type="number" step="any" placeholder="—">
-            <button class="scada-send" type="button" disabled>Enviar consigna</button>
+            <input id="scada-requested-sp" type="number" min="25" max="140" step="0.1" required placeholder="25–140" inputmode="decimal">
+            <button class="scada-send" id="scada-send" type="submit" disabled>Enviar consigna</button>
           </fieldset>
+          </form>
+          <p class="scada-note scada-limit-note">Límites actuales del firmware · 25–140 °C, provisionales.</p>
+          <dl class="scada-status-list">
+            <div><dt>SP solicitado</dt><dd id="scada-sp-requested">—</dd></div>
+            <div><dt>Solicitud / confirmación</dt><dd id="scada-request-state">—</dd></div>
+          </dl>
         </section>
 
         <section class="scada-panel" aria-labelledby="scada-status-title">
           <h2 id="scada-status-title">Estado del horno</h2>
           <dl class="scada-status-list">
-            <div><dt>Modo de operación</dt><dd id="scada-mode">Sin lectura</dd></div>
-            <div><dt>Alarmas activas</dt><dd id="scada-alarms">Sin lectura</dd></div>
+            <div><dt>ESP32</dt><dd id="scada-esp32">Sin lectura</dd></div>
+            <div><dt>PLC Siemens</dt><dd id="scada-plc">Sin lectura</dd></div>
+            <div><dt>Actividad del horno</dt><dd id="scada-oven">Sin lectura</dd></div>
+            <div><dt>Alarma del PLC</dt><dd id="scada-alarms">Sin lectura</dd></div>
           </dl>
         </section>
       </div>
@@ -91,14 +142,14 @@
 
     <section class="scada-panel scada-integration" aria-labelledby="scada-integration-title">
       <div class="scada-section-heading">
-        <h2 id="scada-integration-title">Integración prevista</h2>
+        <h2 id="scada-integration-title">Comunicación del sistema</h2>
         <a href="semanas/semana-12.html">Ver las pruebas del horno <span aria-hidden="true">↗</span></a>
       </div>
-      <ol class="scada-route" aria-label="Ruta prevista de la telemetría">
+      <ol class="scada-route" aria-label="Ruta de la telemetría">
         <li><strong>PLC Siemens</strong><span>Control del horno</span></li>
-        <li><strong>ESP32</strong><span>Enlace Modbus TCP con el PLC</span></li>
+        <li><strong>ESP32</strong><span>Servidor Modbus TCP · MQTT seguro</span></li>
         <li><strong>ThingsBoard</strong><span>Plataforma de telemetría</span></li>
-        <li><strong>Web KOVAX</strong><span>Panel de supervisión</span></li>
+        <li><strong>Web KOVAX</strong><span>Telemetría mediante API</span></li>
       </ol>
     </section>
   </main>

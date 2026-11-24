@@ -428,3 +428,149 @@ html[data-theme="light"] .scada {
     transform: rotate(135deg);
   }
 }
+
+.scada [hidden] {
+  display: none !important;
+}
+
+.scada-access {
+  margin-top: 22px;
+}
+
+.scada-access summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.scada-access summary span {
+  margin-left: 12px;
+  color: var(--muted);
+  font-size: .8rem;
+  font-weight: 400;
+}
+
+.scada-login-fields {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 14px;
+}
+
+.scada-login-fields > div {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+
+.scada-access-description {
+  color: var(--muted);
+  font-size: .88rem;
+  margin: 14px 0;
+}
+
+.scada select {
+  width: 100%;
+  min-height: 43px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  background: var(--bg2);
+  font: inherit;
+  font-size: .85rem;
+}
+
+.scada-access-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.scada-access-actions a {
+  font-size: .8rem;
+  color: var(--scada-pv);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.scada-fan-values {
+  flex-direction: column;
+}
+
+.scada-fan-values span {
+  color: var(--muted);
+  font-size: .83rem;
+}
+
+.scada-fan-values strong {
+  color: var(--text);
+  margin-left: 8px;
+  font-size: .9rem;
+}
+
+.scada-badge[data-state="online"] {
+  color: var(--scada-pv);
+  border-color: color-mix(in srgb, var(--scada-pv) 50%, var(--border));
+  background: color-mix(in srgb, var(--scada-pv) 8%, var(--panel));
+}
+
+.scada .scada-error,
+.scada-badge[data-state="error"] {
+  color: #ffb4a6;
+}
+
+html[data-theme="light"] .scada .scada-error,
+html[data-theme="light"] .scada-badge[data-state="error"] {
+  color: #aa3220;
+}
+
+.scada-live-chart {
+  display: block;
+  min-height: 285px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background-image: none;
+}
+
+.scada-live-chart canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.scada-live-chart p {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(75%, 30ch);
+  transform: translate(-50%, -50%);
+}
+
+.scada-limit-note {
+  font-size: .75rem;
+}
+
+.scada input:focus-visible,
+.scada select:focus-visible,
+.scada button:focus-visible,
+.scada summary:focus-visible {
+  outline: 2px solid var(--scada-pv);
+  outline-offset: 3px;
+}
+
+@media (max-width: 560px) {
+  .scada-login-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .scada-access summary span {
+    display: block;
+    margin-left: 19px;
+  }
+
+  .scada-live-chart {
+    min-height: 250px;
+  }
+}
