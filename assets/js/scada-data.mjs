@@ -1,8 +1,3 @@
-export const CLOUD_SERVERS = [
-  "https://thingsboard.cloud",
-  "https://eu.thingsboard.cloud"
-];
-
 export const TELEMETRY_KEYS = [
   "esp32_online", "plc_online", "pv", "sp", "heating", "fan_01", "fan_02",
   "oven_active", "alarm", "heartbeat", "sp_requested", "sp_request_id", "sp_ack"
@@ -14,19 +9,6 @@ export const POLL_MS = 5000;
 export const HISTORY_MS = 30 * 60 * 1000;
 export const SP_MIN = 25;
 export const SP_MAX = 140;
-
-export function validateConnection(server, deviceId, authType, credential) {
-  if (!CLOUD_SERVERS.includes(server)) {
-    throw new Error("Selecciona el servidor de ThingsBoard Cloud.");
-  }
-  if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(deviceId)) {
-    throw new Error("El Device ID debe ser el UUID del dispositivo.");
-  }
-  if (!["ApiKey", "Bearer"].includes(authType) || !credential || /\s/.test(credential)) {
-    throw new Error("Introduce la clave API o el JWT de usuario, sin prefijos ni espacios.");
-  }
-  return { server, deviceId, authorization: `${authType} ${credential}` };
-}
 
 export function parseBoolean(value) {
   if (value === true || value === "true" || value === 1 || value === "1") return true;
@@ -119,42 +101,36 @@ export function mergeHistory(previous, incoming, now = Date.now()) {
   return [...points.values()].sort((a, b) => a.ts - b.ts);
 }
 
-export class ThingsBoardError extends Error {
+export class ScadaApiError extends Error {
   constructor(message, status = 0) {
     super(message);
     this.status = status;
   }
 }
 
-export async function requestThingsBoard(connection, path, options = {}) {
+export async function requestBackend(connection, path, options = {}) {
   const { method = "GET", body, timeoutMs = 12000 } = options;
   const controller = new AbortController();
   connection.controllers.add(controller);
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const headers = { "X-Authorization": connection.authorization };
+    const headers = {};
+    if (connection.token) headers.Authorization = `Bearer ${connection.token}`;
     if (body) headers["Content-Type"] = "application/json";
-    const response = await fetch(connection.server + path, {
+    const response = await fetch(connection.origin + path, {
       method, headers, body: body ? JSON.stringify(body) : undefined,
       signal: controller.signal, cache: "no-store", credentials: "omit",
       redirect: "error", referrerPolicy: "no-referrer"
     });
+    const data = await response.json();
     if (!response.ok) {
-      const messages = {
-        400: "ThingsBoard rechazó la solicitud. Revisa el dispositivo y los parámetros.",
-        401: "La credencial de usuario caducó o no es válida. Conecta de nuevo.",
-        403: "Tu acceso de usuario no tiene permiso para esta operación.",
-        404: "Dispositivo no encontrado. Revisa el Device ID y el servidor.",
-        429: "ThingsBoard limitó las consultas. Se reintentará la lectura.",
-        504: "ThingsBoard no confirmó la respuesta del ESP32 dentro del plazo."
-      };
-      throw new ThingsBoardError(messages[response.status] || `ThingsBoard respondió con HTTP ${response.status}.`, response.status);
+      throw new ScadaApiError(data.error || "El servidor no pudo completar la operación.", response.status);
     }
-    return await response.json();
+    return data;
   } catch (error) {
-    if (error instanceof ThingsBoardError) throw error;
-    if (error.name === "AbortError") throw new ThingsBoardError("La consulta superó el tiempo de espera.");
-    throw new ThingsBoardError("No se pudo consultar ThingsBoard. Revisa la red y el permiso CORS para esta web.");
+    if (error instanceof ScadaApiError) throw error;
+    if (error.name === "AbortError") throw new ScadaApiError("El servidor superó el tiempo de espera.");
+    throw new ScadaApiError("No se pudo conectar al servicio SCADA. Revisa tu conexión y vuelve a intentarlo.");
   } finally {
     clearTimeout(timeout);
     connection.controllers.delete(controller);

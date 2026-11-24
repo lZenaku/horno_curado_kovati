@@ -1,15 +1,18 @@
 import {
-  TELEMETRY_KEYS, STALE_MS, POLL_MS, HISTORY_MS, SP_MIN, SP_MAX,
-  validateConnection, latestPoint, readSnapshot, nextRequestId,
-  requestOutcome, mergeHistory, requestThingsBoard
-} from "./scada-data.mjs?v=tb-api";
+  STALE_MS, POLL_MS, HISTORY_MS, SP_MIN, SP_MAX,
+  latestPoint, readSnapshot, nextRequestId,
+  requestOutcome, mergeHistory, requestBackend
+} from "./scada-data.mjs?v=auth-v1";
 
 const byId = id => document.getElementById(id);
 const login = byId("scada-login");
 const access = byId("scada-access");
 const connectButton = byId("scada-connect");
 const disconnectButton = byId("scada-disconnect");
-const credentialInput = byId("scada-credential");
+const emailInput = byId("scada-email");
+const passwordInput = byId("scada-password");
+const BACKEND_ORIGIN = "https://kovax-scada-access.foamybarge64.chatgpt.site";
+const SESSION_KEY = "kovax-scada-session";
 const control = byId("scada-control");
 const sendButton = byId("scada-send");
 const setpointInput = byId("scada-requested-sp");
@@ -25,6 +28,7 @@ const chartTimeFormat = new Intl.DateTimeFormat("es-PE", {
 });
 
 let session = null;
+let connecting = false;
 let latest = {};
 let history = { pv: [], sp: [] };
 let pollTimer;
@@ -58,15 +62,17 @@ function setAccessMessage(message, error = false) {
 function lockLogin(locked) {
   for (const field of login.querySelectorAll("input, select")) field.disabled = locked;
   connectButton.disabled = locked;
-  connectButton.hidden = locked;
-  disconnectButton.hidden = !locked;
+  connectButton.hidden = Boolean(session);
+  disconnectButton.hidden = !session;
 }
 
-function disconnect(message = "Sesión desconectada. Introduce tu acceso para volver a consultar.") {
+function disconnect(message = "Sesión cerrada. Ingresa con tu cuenta para volver a consultar.") {
+  connecting = false;
+  try { sessionStorage.removeItem(SESSION_KEY); } catch {}
   clearTimeout(pollTimer);
   if (session) {
     for (const controller of session.controllers) controller.abort();
-    session.authorization = "";
+    session.token = "";
   }
   session = null;
   latest = {};
@@ -77,11 +83,11 @@ function disconnect(message = "Sesión desconectada. Introduce tu acceso para vo
   readError = "";
   historyError = "";
   commandMessage = "";
-  credentialInput.value = "";
+  passwordInput.value = "";
   setpointInput.value = "";
   lockLogin(false);
   access.open = true;
-  setText("scada-session-label", "Conectar dispositivo");
+  setText("scada-session-label", "Iniciar sesión");
   setAccessMessage(message);
   render();
   drawChart();
@@ -116,10 +122,12 @@ function checkPending(snapshot) {
 function render() {
   const snapshot = readSnapshot(latest);
   checkPending(snapshot);
-  if (!session) {
-    setConnection("Sin sesión", "ThingsBoard Cloud");
+  if (connecting) {
+    setConnection("Iniciando sesión", "Acceso del equipo KOVAX");
+  } else if (!session) {
+    setConnection("Sin sesión", "Acceso del equipo KOVAX");
   } else if (!session.readSuccessful) {
-    setConnection("Conectando", "Consultando ThingsBoard");
+    setConnection("Conectando", "Consultando la telemetría");
   } else if (readError) {
     setConnection("Lectura interrumpida", "Reintentando consulta", "error");
   } else if (snapshot.esp32 === true && snapshot.plc === true) {
@@ -163,17 +171,9 @@ function render() {
   setText("scada-control-note", controlMessage(snapshot));
 }
 
-function telemetryPath(connection) {
-  return `/api/plugins/telemetry/DEVICE/${connection.deviceId}/values/timeseries`;
-}
-
 async function loadHistory(connection) {
   const now = Date.now();
-  const query = new URLSearchParams({
-    keys: "pv,sp", startTs: String(now - HISTORY_MS), endTs: String(now),
-    limit: "1000", agg: "NONE", orderBy: "ASC"
-  });
-  const data = await requestThingsBoard(connection, `${telemetryPath(connection)}?${query}`);
+  const data = await requestBackend(connection, "/api/telemetry/history");
   if (session !== connection) return;
   history.pv = mergeHistory(history.pv, data.pv);
   history.sp = mergeHistory(history.sp, data.sp);
@@ -184,8 +184,15 @@ async function loadHistory(connection) {
 async function poll(connection) {
   if (session !== connection) return;
   try {
-    const query = new URLSearchParams({ keys: TELEMETRY_KEYS.join(",") });
-    const data = await requestThingsBoard(connection, `${telemetryPath(connection)}?${query}`);
+    if (!connection.validated) {
+      const identity = await requestBackend(connection, "/api/session");
+      if (session !== connection) return;
+      connection.user = identity.user;
+      connection.expiresAt = identity.expiresAt;
+      connection.validated = true;
+      saveSession(connection);
+    }
+    const data = await requestBackend(connection, "/api/telemetry/latest");
     if (session !== connection) return;
     if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("ThingsBoard devolvió una respuesta de telemetría inesperada.");
     latest = data;
@@ -193,8 +200,8 @@ async function poll(connection) {
     connection.readSuccessful = true;
     readError = "";
     if (firstRead) access.open = false;
-    setText("scada-session-label", "Sesión conectada");
-    setAccessMessage("Sesión conectada a KOVAX_ESP32_HORNO. La clave se conserva en memoria durante esta sesión.");
+    setText("scada-session-label", connection.user.name);
+    setAccessMessage(`Sesión de ${connection.user.email}. Usa Cerrar sesión para salir de este equipo.`);
     const snapshot = readSnapshot(latest);
     if (snapshot.processAvailable) {
       for (const key of ["pv", "sp"]) {
@@ -213,7 +220,7 @@ async function poll(connection) {
     }
   } catch (error) {
     if (session !== connection) return;
-    if (!connection.readSuccessful || error.status === 401 || error.status === 403 || error.status === 404) {
+    if (error.status === 401) {
       disconnect(error.message);
       setAccessMessage(error.message, true);
       return;
@@ -228,28 +235,82 @@ async function poll(connection) {
   }
 }
 
-login.addEventListener("submit", event => {
-  event.preventDefault();
-  if (session) return;
+function saveSession(connection) {
   try {
-    const connection = validateConnection(
-      byId("scada-server").value, byId("scada-device-id").value.trim(),
-      byId("scada-auth-type").value, credentialInput.value.trim()
-    );
-    connection.controllers = new Set();
-    connection.readSuccessful = false;
-    session = connection;
-    credentialInput.value = "";
-    lockLogin(true);
-    setAccessMessage("Consultando la telemetría del dispositivo…");
-    render();
-    void poll(connection);
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+      token: connection.token, expiresAt: connection.expiresAt, user: connection.user
+    }));
+  } catch {
+    setAccessMessage("Este navegador bloquea la conservación de la sesión. El acceso seguirá activo en esta visita.");
+  }
+}
+
+function restoreSession() {
+  let saved;
+  try { saved = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null"); } catch { return; }
+  if (!saved || !/^[A-Za-z0-9_-]{43}$/.test(saved.token) || !Number.isFinite(saved.expiresAt) || saved.expiresAt <= Date.now()) {
+    try { sessionStorage.removeItem(SESSION_KEY); } catch {}
+    return;
+  }
+  session = {
+    origin: BACKEND_ORIGIN, token: saved.token, expiresAt: saved.expiresAt,
+    controllers: new Set(), readSuccessful: false, validated: false
+  };
+  lockLogin(true);
+  setText("scada-session-label", "Recuperando sesión");
+  render();
+  void poll(session);
+}
+
+login.addEventListener("submit", async event => {
+  event.preventDefault();
+  if (session || connecting) return;
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  if (!email || !password) return;
+  connecting = true;
+  passwordInput.value = "";
+  lockLogin(true);
+  connectButton.textContent = "Ingresando…";
+  setAccessMessage("Comprobando usuario y contraseña…");
+  render();
+  const connection = { origin: BACKEND_ORIGIN, controllers: new Set() };
+  try {
+    const identity = await requestBackend(connection, "/api/auth/login", {
+      method: "POST", body: { email, password }
+    });
+    if (!/^[A-Za-z0-9_-]{43}$/.test(identity.token) || !identity.user?.email || !Number.isFinite(identity.expiresAt)) {
+      throw new Error("El servicio devolvió una sesión inesperada.");
+    }
+    session = {
+      ...connection, ...identity, readSuccessful: false, validated: true
+    };
+    saveSession(session);
+    setText("scada-session-label", session.user.name);
+    access.open = false;
+    void poll(session);
   } catch (error) {
     setAccessMessage(error.message, true);
+    setText("scada-session-label", "Iniciar sesión");
+  } finally {
+    connecting = false;
+    connectButton.textContent = "Ingresar";
+    lockLogin(Boolean(session));
+    render();
   }
 });
 
-disconnectButton.addEventListener("click", () => disconnect());
+disconnectButton.addEventListener("click", async () => {
+  const connection = session;
+  if (!connection) return;
+  disconnectButton.disabled = true;
+  try { await requestBackend(connection, "/api/auth/logout", { method: "POST" }); }
+  catch { /* The local session is also cleared when the server is unavailable. */ }
+  finally {
+    disconnect();
+    disconnectButton.disabled = false;
+  }
+});
 
 byId("scada-setpoint-form").addEventListener("submit", async event => {
   event.preventDefault();
@@ -276,9 +337,9 @@ byId("scada-setpoint-form").addEventListener("submit", async event => {
   render();
   try {
     // RPC writes are sent once. A retry could execute a second command.
-    const response = await requestThingsBoard(connection, `/api/rpc/twoway/${connection.deviceId}`, {
-      method: "POST", timeoutMs: 15000,
-      body: { method: "setSetpoint", params: { value }, timeout: 10000, persistent: false }
+    const response = await requestBackend(connection, "/api/control/setpoint", {
+      method: "POST", timeoutMs: 35000,
+      body: { value, commandId: crypto.randomUUID() }
     });
     if (session !== connection || pendingRequest !== intent) return;
     if (response?.success === false) {
@@ -293,7 +354,7 @@ byId("scada-setpoint-form").addEventListener("submit", async event => {
     }
   } catch (error) {
     if (session !== connection || pendingRequest !== intent) return;
-    if ([400, 401, 403, 404, 429].includes(error.status)) {
+    if ([400, 401, 403, 404, 409, 429].includes(error.status)) {
       pendingRequest = null;
       commandMessage = error.message;
     } else {
@@ -392,7 +453,13 @@ function drawChart() {
 new ResizeObserver(drawChart).observe(canvas.parentElement);
 new MutationObserver(drawChart).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 setInterval(() => { render(); drawChart(); }, 1000);
-window.addEventListener("pagehide", () => disconnect());
+window.addEventListener("pagehide", () => {
+  clearTimeout(pollTimer);
+  if (session) for (const controller of session.controllers) controller.abort();
+  session = null;
+});
+window.addEventListener("pageshow", event => { if (event.persisted) restoreSession(); });
 lockLogin(false);
+restoreSession();
 render();
 drawChart();
